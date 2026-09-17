@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { Allocation, Plan } from '../lib/model';
 import { broadcastOf, contains, longToIpv4, parseCidr, usableHosts } from '../lib/ip';
+import DhcpPoolModal from './DhcpPoolModal';
 
 interface Props {
   plan: Plan;
@@ -8,6 +10,7 @@ interface Props {
 }
 
 export default function AllocationsPanel({ plan, onRelease, onResize }: Props) {
+  const [dhcpTarget, setDhcpTarget] = useState<Allocation | null>(null);
   const rootOf = (alloc: Allocation) => {
     const ac = parseCidr(alloc.cidr);
     if (!ac) return '—';
@@ -64,6 +67,11 @@ export default function AllocationsPanel({ plan, onRelease, onResize }: Props) {
                     <td className="muted">{a.note ?? '—'}</td>
                     <td>
                       <span className="row-actions inline">
+                        {a.kind === 'subnet' && (
+                          <button className="btn small" onClick={() => setDhcpTarget(a)}>
+                            DHCP 池
+                          </button>
+                        )}
                         <button className="btn small" onClick={() => onResize(a)}>
                           调整容量
                         </button>
@@ -83,6 +91,9 @@ export default function AllocationsPanel({ plan, onRelease, onResize }: Props) {
             </tbody>
           </table>
         </div>
+      )}
+      {dhcpTarget && (
+        <DhcpPoolModal alloc={dhcpTarget} onClose={() => setDhcpTarget(null)} />
       )}
     </section>
   );
