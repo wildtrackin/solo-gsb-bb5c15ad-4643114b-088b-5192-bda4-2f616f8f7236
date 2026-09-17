@@ -23,6 +23,7 @@ import TreeView from './components/TreeView';
 import AllocationsPanel from './components/AllocationsPanel';
 import NewAllocationForm from './components/NewAllocationForm';
 import MigrationModal from './components/MigrationModal';
+import DhcpPoolModal from './components/DhcpPoolModal';
 
 interface MigrationRequest {
   title: string;
@@ -64,6 +65,7 @@ export default function App() {
   const [future, setFuture] = useState<Plan[]>([]);
   const [migration, setMigration] = useState<MigrationRequest | null>(null);
   const [resizeTarget, setResizeTarget] = useState<Allocation | null>(null);
+  const [dhcpTarget, setDhcpTarget] = useState<Allocation | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
   const showToast = useCallback((msg: string) => {
@@ -332,6 +334,7 @@ export default function App() {
             plan={plan}
             onRelease={releaseAllocation}
             onResize={(a) => setResizeTarget(a)}
+            onDhcpPool={(a) => setDhcpTarget(a)}
           />
         </section>
       </main>
@@ -361,6 +364,17 @@ export default function App() {
             showToast('迁移已整批原子应用');
           }}
           onCancel={() => setMigration(null)}
+        />
+      )}
+
+      {dhcpTarget && (
+        <DhcpPoolModal
+          alloc={dhcpTarget}
+          onClose={() => setDhcpTarget(null)}
+          onCopied={(msg) => {
+            showToast(msg);
+            setDhcpTarget(null);
+          }}
         />
       )}
     </div>

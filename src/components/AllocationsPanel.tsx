@@ -5,9 +5,10 @@ interface Props {
   plan: Plan;
   onRelease: (id: string) => void;
   onResize: (alloc: Allocation) => void;
+  onDhcpPool: (alloc: Allocation) => void;
 }
 
-export default function AllocationsPanel({ plan, onRelease, onResize }: Props) {
+export default function AllocationsPanel({ plan, onRelease, onResize, onDhcpPool }: Props) {
   const rootOf = (alloc: Allocation) => {
     const ac = parseCidr(alloc.cidr);
     if (!ac) return '—';
@@ -64,6 +65,11 @@ export default function AllocationsPanel({ plan, onRelease, onResize }: Props) {
                     <td className="muted">{a.note ?? '—'}</td>
                     <td>
                       <span className="row-actions inline">
+                        {a.kind === 'subnet' && (
+                          <button className="btn small" onClick={() => onDhcpPool(a)}>
+                            生成 DHCP 地址池
+                          </button>
+                        )}
                         <button className="btn small" onClick={() => onResize(a)}>
                           调整容量
                         </button>
